@@ -1,0 +1,10 @@
+services:
+  api:
+    build: .
+    image: arch_practice_5_image
+    container_name: arch_practice_5_container
+    ports:
+      - "8000:8000"
+    environment:
+    - DATABASE_URL=sqlite:///./app.db
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
