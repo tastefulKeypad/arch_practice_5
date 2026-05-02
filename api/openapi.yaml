@@ -1,0 +1,657 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /token:
+    post:
+      summary: Login For Token
+      operationId: login_for_token_token_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_login_for_token_token_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /rentService/add_rent:
+    post:
+      tags:
+      - rentService
+      summary: Add Rent
+      description: 'Create a new rent and add it to database
+
+
+        Must be normal user to use this endpoint'
+      operationId: add_rent_rentService_add_rent_post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: carId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Carid
+      - name: dateStart
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+          title: Datestart
+      - name: dateEnd
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+          title: Dateend
+      - name: status
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /rentService/get_active_rent:
+    get:
+      tags:
+      - rentService
+      summary: Get Active Rent
+      description: 'Get a list of all active rents by given user id
+
+
+        Normal users can only query for their own id
+
+
+        Admins can query for any user id'
+      operationId: get_active_rent_rentService_get_active_rent_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Userid
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentResponse'
+                title: Response Get Active Rent Rentservice Get Active Rent Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /rentService/get_rent_history:
+    get:
+      tags:
+      - rentService
+      summary: Get Rent History
+      description: 'Get history of rents by given user id
+
+
+        Normal users can only query for their own id
+
+
+        Admins can query for any user id'
+      operationId: get_rent_history_rentService_get_rent_history_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Userid
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentResponse'
+                title: Response Get Rent History Rentservice Get Rent History Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /rentService/finish_rent:
+    patch:
+      tags:
+      - rentService
+      summary: Finish Rent
+      description: 'Finalize rent and change it''s state from ''Active'' to ''Inactive''
+
+
+        Must be admin to use this endpoint'
+      operationId: finish_rent_rentService_finish_rent_patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clientService/create_user:
+    post:
+      tags:
+      - clientService
+      summary: Create User
+      description: Create a new user and add him to database
+      operationId: create_user_clientService_create_user_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clientService/get_all_users:
+    get:
+      tags:
+      - clientService
+      summary: Get Users
+      description: "Get list of all registered users \n\nMust be admin to use this\
+        \ endpoint"
+      operationId: get_users_clientService_get_all_users_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+                type: array
+                title: Response Get Users Clientservice Get All Users Get
+      security:
+      - OAuth2PasswordBearer: []
+  /clientService/get_user_by_email:
+    get:
+      tags:
+      - clientService
+      summary: Get User By Email
+      description: 'Get user with given email (login)
+
+
+        Must be admin to use this endpoint'
+      operationId: get_user_by_email_clientService_get_user_by_email_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Email
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /clientService/get_user_by_name_and_surname:
+    get:
+      tags:
+      - clientService
+      summary: Get User By Name And Surname
+      description: 'Get all users with given name and surname
+
+
+        Must be admin to use this endpoint'
+      operationId: get_user_by_name_and_surname_clientService_get_user_by_name_and_surname_get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Name
+      - name: surName
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Surname
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+                title: Response Get User By Name And Surname Clientservice Get User
+                  By Name And Surname Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /autoParkService/add_car:
+    post:
+      tags:
+      - autoParkService
+      summary: Add Car
+      description: 'Create a new car and add it to database
+
+
+        Must be admin to use this endpoint'
+      operationId: add_car_autoParkService_add_car_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /autoParkService/get_all_cars:
+    get:
+      tags:
+      - autoParkService
+      summary: Get All Cars
+      description: Get list of all cars
+      operationId: get_all_cars_autoParkService_get_all_cars_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CarResponse'
+                type: array
+                title: Response Get All Cars Autoparkservice Get All Cars Get
+  /autoParkService/get_car_by_class:
+    get:
+      tags:
+      - autoParkService
+      summary: Get Car By Class
+      description: Get all cars with given class
+      operationId: get_car_by_class_autoParkService_get_car_by_class_get
+      parameters:
+      - name: carClass
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Carclass
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CarResponse'
+                title: Response Get Car By Class Autoparkservice Get Car By Class
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /autoParkService/check_available_cars:
+    get:
+      tags:
+      - autoParkService
+      summary: Check Available Cars
+      description: Get list of all available cars in given time frame
+      operationId: check_available_cars_autoParkService_check_available_cars_get
+      parameters:
+      - name: dateStart
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+          title: Datestart
+      - name: dateEnd
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+          title: Dateend
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CarResponse'
+                title: Response Check Available Cars Autoparkservice Check Available
+                  Cars Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Body_login_for_token_token_post:
+      properties:
+        grant_type:
+          anyOf:
+          - type: string
+            pattern: ^password$
+          - type: 'null'
+          title: Grant Type
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          format: password
+          title: Password
+        scope:
+          type: string
+          title: Scope
+          default: ''
+        client_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Id
+        client_secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          format: password
+          title: Client Secret
+      type: object
+      required:
+      - username
+      - password
+      title: Body_login_for_token_token_post
+    CarCreate:
+      properties:
+        carClass:
+          type: integer
+          title: Carclass
+        price:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Price
+        capacity:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Capacity
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - carClass
+      - price
+      - capacity
+      - name
+      title: CarCreate
+      description: Schema for creating a new car
+    CarResponse:
+      properties:
+        carClass:
+          type: integer
+          title: Carclass
+        price:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Price
+        capacity:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Capacity
+        name:
+          type: string
+          title: Name
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+      - carClass
+      - price
+      - capacity
+      - name
+      - id
+      title: CarResponse
+      description: Schema with car response
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    RentResponse:
+      properties:
+        carId:
+          type: integer
+          title: Carid
+        userId:
+          type: integer
+          title: Userid
+        dateStart:
+          type: string
+          format: date-time
+          title: Datestart
+        dateEnd:
+          type: string
+          format: date-time
+          title: Dateend
+        status:
+          type: string
+          title: Status
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+      - carId
+      - userId
+      - dateStart
+      - dateEnd
+      - status
+      - id
+      title: RentResponse
+      description: Schema with rent response
+    Token:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+      type: object
+      required:
+      - access_token
+      - token_type
+      title: Token
+      description: Base schema with JWT token fields
+    UserCreate:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        name:
+          type: string
+          title: Name
+        surName:
+          type: string
+          title: Surname
+        isAdmin:
+          type: boolean
+          title: Isadmin
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - name
+      - surName
+      - isAdmin
+      - password
+      title: UserCreate
+      description: Schema for creating a new user
+    UserResponse:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        name:
+          type: string
+          title: Name
+        surName:
+          type: string
+          title: Surname
+        isAdmin:
+          type: boolean
+          title: Isadmin
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+      - email
+      - name
+      - surName
+      - isAdmin
+      - id
+      title: UserResponse
+      description: Schema with user response
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /token

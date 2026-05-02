@@ -1,10 +1,24 @@
+volumes:
+  redis_data:
+
 services:
+  redis:
+    image: redis:latest
+    container_name: arch_practice_5_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data 
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --bind 0.0.0.0
+
   api:
-    build: .
+    build: ./api
     image: arch_practice_5_image
-    container_name: arch_practice_5_container
+    container_name: arch_practice_5_api
     ports:
       - "8000:8000"
     environment:
     - DATABASE_URL=sqlite:///./app.db
+    - REDIS_HOST=redis 
+    - REDIS_PORT=6379
     command: uvicorn main:app --host 0.0.0.0 --port 8000
