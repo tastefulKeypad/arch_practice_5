@@ -1,1 +1,1 @@
-__all__ = ['authService', 'rentService', 'clientService', 'autoParkService', 'commonFunctions']
+__all__ = ['authService', 'rentService', 'clientService', 'autoParkService', 'commonFunctions', 'redisFunctions']

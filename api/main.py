@@ -129,8 +129,67 @@ def populate_db(
             name="Skoda"
         )
     ]
+    rents = [
+        models.Rent(
+            carId=1,
+            userId=2,
+            dateStart=datetime.fromisoformat("2026-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2026-02-01T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=2,
+            userId=3,
+            dateStart=datetime.fromisoformat("2026-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2026-02-01T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=3,
+            userId=4,
+            dateStart=datetime.fromisoformat("2026-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2026-03-23T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=4,
+            userId=2,
+            dateStart=datetime.fromisoformat("2026-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2026-01-10T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=5,
+            userId=3,
+            dateStart=datetime.fromisoformat("2026-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2027-10-01T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=1,
+            userId=4,
+            dateStart=datetime.fromisoformat("2027-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2027-02-01T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=2,
+            userId=2,
+            dateStart=datetime.fromisoformat("2027-01-01T00:00:00"),
+            dateEnd=datetime.fromisoformat("2027-02-01T00:00:00"),
+            status="Active"
+        ),
+        models.Rent(
+            carId=3,
+            userId=3,
+            dateStart=datetime.fromisoformat("2027-01-15T00:00:00"),
+            dateEnd=datetime.fromisoformat("2027-03-01T00:00:00"),
+            status="Active"
+        )
+    ]
     db.add_all(users)
     db.add_all(cars)
+    db.add_all(rents)
     db.commit()
     return {"message": "Successfully populated db with basic objects"}
     

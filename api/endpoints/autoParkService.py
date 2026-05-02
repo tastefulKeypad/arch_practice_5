@@ -10,8 +10,10 @@ from pwdlib import PasswordHash
 # Imports from local files
 import db.database as appdb
 import db.models as models
+from db.database import redisClient
 import schemas.car, schemas.token, schemas.rent
 from endpoints.commonFunctions import *
+from endpoints.redisFunctions import *
 from securityConfig import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 passwordHash = PasswordHash.recommended()
@@ -73,16 +75,23 @@ def check_available_cars(
     """
     Get list of all available cars in given time frame
     """
+    redisCacheData = RedisGetCachedCars(dateStart, dateEnd)
+    if redisCacheData is not None:
+        if not redisCacheData:
+            RaiseExceptionNoCar()
+        return redisCacheData
+
     dbBadCars = db.query(models.Rent).filter(
         (dateStart < models.Rent.dateEnd) &
         (dateEnd   > models.Rent.dateStart) &
         (models.Rent.status == "Active") 
     ).all()
-    dbBadIds = [models.Rent.id for car in dbBadCars]
+    dbBadIds = [badCar.carId for badCar in dbBadCars]
     dbCar = db.query(models.Car).filter(
-        models.Rent.id.notin_(dbBadIds)
+        models.Car.id.notin_(dbBadIds)
     ).all()
 
+    RedisCacheCars(dbCar, dateStart, dateEnd)
     if not dbCar:
         RaiseExceptionNoCar()
     return dbCar
