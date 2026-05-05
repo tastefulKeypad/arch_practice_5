@@ -12,6 +12,7 @@ import db.database as appdb
 import db.models as models
 import schemas.car, schemas.rent, schemas.token
 from endpoints.commonFunctions import *
+from endpoints.redisFunctions import *
 from securityConfig import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 passwordHash = PasswordHash.recommended()
@@ -61,6 +62,7 @@ def add_rent(
     db.add(newRent)
     db.commit()
     db.refresh(newRent)
+    RedisUpdateCacheRemoveCar(dbCar, dateStart, dateEnd)
     return newRent
 
 @router.get("/get_active_rent", response_model=List[schemas.rent.RentResponse])
@@ -148,9 +150,13 @@ def finish_rent(
     ).first()
     if not dbRent:
         RaiseExceptionValidRentNotFound()
+    dbCar = db.query(models.Car).filter(
+        models.Car.id == dbRent.carId
+    ).first()
 
     dbRent.status = "Inactive"
     db.add(dbRent)
     db.commit()
     db.refresh(dbRent)
+    RedisUpdateCacheAddCar(dbCar, dbRent.dateStart, dbRent.dateEnd)
     return dbRent

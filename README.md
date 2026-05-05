@@ -9,14 +9,17 @@
 arch_practice_5
 ├── api
 │   ├── db        - Содержит модели объектов для БД и файл инициализации БД
-│   ├── endpoints - Содержит endpoint'ы API
+│   ├── endpoints - Содержит endpoint'ы API + функции кеширования/лимитирования
 │   └── schemas   - Содержит схемы объектов для валидации pydantic
 ```
 
 # Реализованные оптимизации
 Реализовано кеширование "горячих" эндпоинтов `/autoParkService/check_available_cars` и `/rentService/add_rent` с использованием Redis. 
+
 Функции кеширования Redis вынесены в файл: `/api/endpoints/redisFunctions.py`.
+
 Реализовано rate limiting эндпоинта `/autoParkService/check_available_cars`.
+
 Подробная аргументация выбранных методов кеширования и rate limiting приведены в `performance_design.md`.
 
 # Запуск проекта

@@ -10,7 +10,6 @@ from pwdlib import PasswordHash
 # Imports from local files
 import db.database as appdb
 import db.models as models
-from db.database import redisClient
 import schemas.car, schemas.token, schemas.rent
 from endpoints.commonFunctions import *
 from endpoints.redisFunctions import *
