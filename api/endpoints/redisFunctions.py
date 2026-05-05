@@ -4,7 +4,7 @@ from db.database import redisClient
 import db.models as models
 import schemas.car
 
-
+# ================ REDIS CACHE ================
 def RedisCacheCars(
     dbCar: list,
     dateStart: datetime, 
@@ -72,3 +72,23 @@ def RedisUpdateCacheRemoveCar(
             cachedCars = [car for car in cachedCars if car.get('id') != car_id]
             newCacheValue = json.dumps(cachedCars)
             redisClient.setex(key, 60, newCacheValue)
+
+# ================ RATE LIMITING ================
+def TokenBucketIsFull(userId: int):
+    cacheKey = f"userid:{userId}"
+    cacheValue = redisClient.get(cacheKey)
+    if (cacheValue is None):
+        return False
+    return True if int(cacheValue) == 0 else False
+
+def TokenBucketUpdate(userId: int):
+    cacheKey = f"userid:{userId}"
+    cacheValue = redisClient.get(cacheKey)
+    if (cacheValue is None):
+        cacheValue = 4;
+        redisClient.setex(cacheKey, 60, cacheValue)
+    elif (int(cacheValue) > 0):
+        cacheTTL = redisClient.ttl(cacheKey)
+        cacheValue = int(cacheValue)-1
+        redisClient.setex(cacheKey, cacheTTL, cacheValue)
+    return cacheValue

@@ -17,6 +17,18 @@ passwordHash = PasswordHash.recommended()
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 # ================ Common HTTPExceptions ================
+def RaiseExceptionRatelimitExceeded():
+    raise HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail="Ratelimit exceeded",
+        headers={
+            "WWW-Authenticate": "Bearer",
+            "X-RateLimit-Limit": "5",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": "60"
+        }
+    )
+
 def RaiseExceptionAdmin():
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

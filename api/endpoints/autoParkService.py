@@ -3,6 +3,7 @@ from typing import Annotated, List
 import jwt
 from jwt.exceptions import InvalidTokenError
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pwdlib import PasswordHash
@@ -67,18 +68,35 @@ def get_car_by_class(
 
 @router.get("/check_available_cars", response_model=List[schemas.car.CarResponse])
 def check_available_cars(
+    tokenUser: Annotated[models.User, Depends(GetTokenUser)],
     dateStart: datetime,
     dateEnd:   datetime,
     db: Session = Depends(appdb.GetDB)
 ):
     """
     Get list of all available cars in given time frame
+
+    Must be normal user or admin to use this endpoint
+
+    Normal users are rate limited to 5 requests per minute
     """
+    remainingTokens = "unlimited"
+    if not tokenUser.isAdmin:
+        if (TokenBucketIsFull(tokenUser.id)):
+            RaiseExceptionRatelimitExceeded()
+        remainingTokens = TokenBucketUpdate(tokenUser.id)
+
     redisCacheData = RedisGetCachedCars(dateStart, dateEnd)
     if redisCacheData is not None:
         if not redisCacheData:
             RaiseExceptionNoCar()
-        return redisCacheData
+        return JSONResponse(content=redisCacheData,
+                            headers={
+                                "X-RateLimit-Limit": "5",
+                                "X-RateLimit-Remaining": str(remainingTokens),
+                                "X-RateLimit-Reset": "60",
+                                }
+                            )
 
     dbBadCars = db.query(models.Rent).filter(
         (dateStart < models.Rent.dateEnd) &
@@ -93,4 +111,11 @@ def check_available_cars(
     RedisCacheCars(dbCar, dateStart, dateEnd)
     if not dbCar:
         RaiseExceptionNoCar()
-    return dbCar
+    dbCarData = [schemas.car.CarResponse.model_validate(car).model_dump() for car in dbCar]
+    return JSONResponse(content=dbCarData,
+                        headers={
+                            "X-RateLimit-Limit": "5",
+                            "X-RateLimit-Remaining": str(remainingTokens),
+                            "X-RateLimit-Reset": "60",
+                            }
+                        )
